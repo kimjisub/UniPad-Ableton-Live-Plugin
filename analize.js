@@ -35,6 +35,7 @@ function msg_int(i) {
 
 function onNote() {
 	noteSig = 0
+
 	var note = v[0]
 	var velo = v[1]
 
@@ -46,5 +47,22 @@ function onNote() {
 }
 function onControl() {
 	controlSig = 0;
-	outlet(1, v[2] + " / " + v[3]);
+
+	var note = v[2]
+	var velo = v[3]
+
+	if (91 <= note && note <= 98) {
+		outlet(1, (note - 91) + " / " + (velo != 0))
+	}
+	if (19 <= note && note <= 89 && note % 10 == 9) {
+		var c = 9 - Math.floor(note / 10) - 1;
+		outlet(2, (c) + " / " + (velo != 0))
+		outlet(1, (c + 8) + " / " + (velo != 0))
+	}
+	if (1 <= note && note <= 8) {
+		outlet(1, (8 - note + 16) + " / " + (velo != 0))
+	}
+	if (10 <= note && note <= 80 && note % 10 == 0) {
+		outlet(1, (Math.floor(note / 10) - 1 + 24) + " / " + (velo != 0))
+	}
 }
