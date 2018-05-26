@@ -1,15 +1,16 @@
 // inlets
-inlets = 4
+inlets = 5
 setinletassist(0,"Pathname for unzipped unipack")
 setinletassist(1,"Typecode for Pathname")
 setinletassist(2,"onPadTouch")
 setinletassist(3,"onChainTouch")
+setinletassist(4,"launchpad")
 
 // outlets
 outlets = 3
-setoutletassist(0,"LED Pitch")
-setoutletassist(1,"LED Velocity")
-setoutletassist(2,"Channal")
+setoutletassist(0,"Note-on and Note-off")
+setoutletassist(1,"Control Change")
+setoutletassist(2,"Channel")
 
 // inlet params
 var v = new Array(inlets)
