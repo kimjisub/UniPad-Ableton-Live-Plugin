@@ -26,7 +26,6 @@ function msg_int(i) {
 }
 
 function list(note, velo){
-
 	switch(inlet){
 		case 0:
 			onNote(note, velo)

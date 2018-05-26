@@ -1,82 +1,99 @@
 // inlets
 inlets = 5
-setinletassist(0,"Pathname for unzipped unipack")
-setinletassist(1,"Typecode for Pathname")
-setinletassist(2,"onPadTouch")
-setinletassist(3,"onChainTouch")
-setinletassist(4,"launchpad")
+setinletassist(0, "Pathname for unzipped UniPack")
+setinletassist(1, "Typecode for Pathname")
+setinletassist(2, "onPadTouch")
+setinletassist(3, "onChainTouch")
+setinletassist(4, "launchpad")
 
 // outlets
-outlets = 3
-setoutletassist(0,"Note-on and Note-off")
-setoutletassist(1,"Control Change")
-setoutletassist(2,"Channel")
-
-// inlet params
-var v = new Array(inlets)
-for (var i=0;i<inlets;i++)
-	v[i] = 0
+outlets = 4
+setoutletassist(0, "UniPack analize result")
+setoutletassist(1, "Note-on and Note-off")
+setoutletassist(2, "Control Change")
+setoutletassist(3, "Channel")
 
 // waiting params
-var noteSig = 0
-var controlSig = 0
+var folderDone = 0
+var folderURL
+var folderType
 
+// vars
+UniPack = null
 
+function anything() {
+	var a = arrayfromargs(messagename, arguments)
 
-var v = new Array()
-v[0] = v[1] = 0
-var noteSig = 0
-var controlSig = 0
-
-function msg_int(i) {
-	v[inlet] = i
-	switch(inlet){
+	switch (inlet) {
 		case 0:
+			folderURL = a
+			folderDone += 1
+			break;
 		case 1:
-			noteSig += 1
-			break;
-		case 2:
-		case 3:
-			controlSig += 1
+			folderType = a
+			folderDone += 1
 			break;
 	}
 
-	if(noteSig >= 2)
-		onNote()
-	if(controlSig >= 2)
-		onControl()
+	if (folderDone >= 2) {
+		folderDone = 0
+		if (folderType == 'fold')
+			loadUniPack(folderURL)
+
+	}
 }
 
-function onNote() {
-	noteSig = 0
+function list(note, velo) {
+	outlet(0, "list")
+	switch (inlet) {
+		case 0:
+			onNote(note, velo)
+			break;
+		case 1:
+			onControl(note, velo)
+			break;
 
-	var note = v[0]
-	var velo = v[1]
-
-	var x = 9 - Math.floor(note / 10);
-	var y = note % 10;
-	
-	if (y >= 1 && y <= 8)
-		outlet(0, (x - 1) + " / " + (y - 1) + " / " + (velo != 0))
+	}
 }
-function onControl() {
-	controlSig = 0;
 
-	var note = v[2]
-	var velo = v[3]
+function UniPackLED(syntaxs, loop, num) {
+	this.syntaxs = syntaxs
+	this.loop = loop
+	this.num = num
+}
 
-	if (91 <= note && note <= 98) {
-		outlet(1, (note - 91) + " / " + (velo != 0))
+function UniPackLEDSyntaxOn(x, y, color, velo) {
+	this.func = 0
+	this.x = x
+	this.y = y
+	this.color = color
+	this.velo = velo
+}
+
+function UniPackLEDSyntaxOff(x, y) {
+	this.func = 1
+	this.x = x
+	this.y = y
+}
+
+function UniPackLEDSyntaxDelay(d) {
+	this.func = 2
+	this.delay = d
+}
+
+
+function loadUniPack(path) {
+	var keyLED = new Folder(path + "keyLED");
+	keyLED.reset();
+	while (!keyLED.end) {
+		var foldername;
+		if (keyLED.pathname.charAt(keyLED.pathname.length - 1) != "/")
+			foldername = keyLED.pathname + "/" + keyLED.filename;
+		else
+			foldername = keyLED.pathname + keyLED.filename
+		
+		outlet(0, foldername)
+		keyLED.next();
 	}
-	if (19 <= note && note <= 89 && note % 10 == 9) {
-		var c = 9 - Math.floor(note / 10) - 1;
-		outlet(2, (c) + " / " + (velo != 0))
-		outlet(1, (c + 8) + " / " + (velo != 0))
-	}
-	if (1 <= note && note <= 8) {
-		outlet(1, (8 - note + 16) + " / " + (velo != 0))
-	}
-	if (10 <= note && note <= 80 && note % 10 == 0) {
-		outlet(1, (Math.floor(note / 10) - 1 + 24) + " / " + (velo != 0))
-	}
+	keyLED.close();
 }
