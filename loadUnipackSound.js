@@ -44,13 +44,12 @@ function anything() {
 }
 
 function list(note, velo) {
-	outlet(0, "list")
 	switch (inlet) {
-		case 0:
-			onNote(note, velo)
+		case 2:
+			outlet(1, 1)
 			break;
-		case 1:
-			onControl(note, velo)
+		case 3:
+			outlet(1, 1)
 			break;
 
 	}
@@ -83,17 +82,17 @@ function UniPackLEDSyntaxDelay(d) {
 
 
 function loadUniPack(path) {
-	var keyLED = new Folder(path + "keyLED");
-	keyLED.reset();
-	while (!keyLED.end) {
+	var sounds = new Folder(path + "sounds");
+	sounds.reset();
+	while (!sounds.end) {
 		var foldername;
-		if (keyLED.pathname.charAt(keyLED.pathname.length - 1) != "/")
-			foldername = keyLED.pathname + "/" + keyLED.filename;
+		if (sounds.pathname.charAt(sounds.pathname.length - 1) != "/")
+			foldername = sounds.pathname + "/" + sounds.filename;
 		else
-			foldername = keyLED.pathname + keyLED.filename
+			foldername = sounds.pathname + sounds.filename
 		
 		outlet(0, foldername)
-		keyLED.next();
+		sounds.next();
 	}
-	keyLED.close();
+	sounds.close();
 }
